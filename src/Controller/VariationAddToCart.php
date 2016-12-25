@@ -4,10 +4,11 @@ namespace Drupal\commerce_variation_add_to_cart\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Drupal\commerce_order\Entity\Order;
 use Drupal\commerce_order\Entity\OrderItemInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
-use Drupal\commerce_product\Entity\ProductAttributeInterface;
+use Drupal\commerce_cart\CartManagerInterface;
+use Drupal\commerce_cart\CartProviderInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * variation add to cart form controller.
@@ -15,51 +16,64 @@ use Drupal\commerce_product\Entity\ProductAttributeInterface;
 class VariationAddToCart extends ControllerBase {
 
   /**
+   * The cart manager.
+   *
+   * @var \Drupal\commerce_cart\CartManagerInterface
+   */
+  protected $cartManager;
+
+  /**
+   * The cart provider.
+   *
+   * @var \Drupal\commerce_cart\CartProviderInterface
+   */
+  protected $cartProvider;
+
+  public function __construct(CartManagerInterface $cart_manager, CartProviderInterface $cart_provider) {
+    $this->cartManager = $cart_manager;
+    $this->cartProvider = $cart_provider;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('commerce_cart.cart_manager'),
+      $container->get('commerce_cart.cart_provider')
+    );
+  }
+
+  /**
    * Add item to cart.
    */
   public function addItem() {
-
     // Get item data from post request.
     $product_id = (integer) \Drupal::request()->request->get('product_id');
     $variation_id = (integer) \Drupal::request()->request->get('variation_id');
     $quantity = (integer) \Drupal::request()->request->get('quantity');
 
     if ($product_id > 0 && $variation_id > 0 && $quantity > 0) {
-
-      // Get current user.
-      $user = \Drupal::currentUser();
-      $uid = $user->id();
-
       // Load product variation and get store.
       $variation = \Drupal\commerce_product\Entity\ProductVariation::load($variation_id);
       $variation_price = $variation->getPrice();
       $stores = $variation->getStores();
       $store = reset($stores);
 
-      // Get current user's cart.
-      $query = \Drupal::entityQuery('commerce_order')
-        ->condition('cart', TRUE)
-        ->condition('uid', $uid);
-      $result = $query->execute();
-      $cart_id = reset($result);
-
+      $cart = $this->cartProvider->getCart('default', $store);
       // Create cart for user if it already doesn't exist.
-      if (!$cart_id) {
+      if (!$cart) {
         $cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default', $store);
-        $cart_id = $cart->id();
       }
 
-      // Load order, create order item and save it.
-      $order = Order::load($cart_id);
       $order_item = \Drupal\commerce_order\Entity\OrderItem::create([
         'type' => 'default',
-        'purchased_entity' => $variation_id,
+        'purchased_entity' => (string) $variation_id,
         'quantity' => $quantity,
         'unit_price' => $variation_price,
       ]);
       $order_item->save();
-      $order->addItem($order_item);
-      $order->save();
+      $this->cartManager->addOrderItem($cart, $order_item);
 
       // Redirect back to product.
       drupal_set_message($this->t('Added to cart'), 'status', TRUE);
