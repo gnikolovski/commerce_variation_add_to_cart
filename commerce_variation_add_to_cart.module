@@ -22,7 +22,6 @@ function commerce_variation_add_to_cart_theme() {
           'price_currency' => NULL,
           'show_quantity' => NULL,
           'attributes' => NULL,
-          'destination' => NULL,
         ),
     ),
   );

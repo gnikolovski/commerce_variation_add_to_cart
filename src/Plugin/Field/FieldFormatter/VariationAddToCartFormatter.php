@@ -118,7 +118,6 @@ class VariationAddToCartFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $current_path = \Drupal::request()->getRequestUri();
     $element = array();
 
     foreach ($items as $delta => $item) {
@@ -151,7 +150,6 @@ class VariationAddToCartFormatter extends FormatterBase {
         '#price_currency' => $variation_price_currency,
         '#show_quantity' => $this->getSetting('show_quantity') == 1 ? 'number' : 'hidden',
         '#attributes' => $attributes_values,
-        '#destination' => $current_path,
       );
 
     }
