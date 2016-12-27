@@ -52,6 +52,7 @@ class VariationAddToCart extends ControllerBase {
     $product_id = (integer) \Drupal::request()->request->get('product_id');
     $variation_id = (integer) \Drupal::request()->request->get('variation_id');
     $quantity = (integer) \Drupal::request()->request->get('quantity');
+    $destination = \Drupal::request()->request->get('destination');
 
     if ($product_id > 0 && $variation_id > 0 && $quantity > 0) {
       // Load product variation and get store.
@@ -75,13 +76,13 @@ class VariationAddToCart extends ControllerBase {
       $order_item->save();
       $this->cartManager->addOrderItem($cart, $order_item);
 
-      // Redirect back to product.
+      // Redirect back.
       drupal_set_message($this->t('Added to cart'), 'status', TRUE);
-      $response = new RedirectResponse('/product/' . $product_id);
+      $response = new RedirectResponse($destination);
       return $response;
     }
     drupal_set_message($this->t('Item not added to cart'), 'error', TRUE);
-    $response = new RedirectResponse('/product/' . $product_id);
+    $response = new RedirectResponse($destination);
     return $response;
   }
 
