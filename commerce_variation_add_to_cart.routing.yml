@@ -4,4 +4,4 @@ commerce_variation_add_to_cart.variation_cart:
     _controller: '\Drupal\commerce_variation_add_to_cart\Controller\VariationAddToCart::addItem'
     _title: 'Commerce Variation Add to Cart'
   requirements:
-    _permission: 'administer commerce variation add to cart'
+    _permission: 'access variation add to cart'

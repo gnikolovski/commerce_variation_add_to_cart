@@ -21,6 +21,8 @@
     <input type="hidden" name="product_id" value="{{ product_id }}" />
     <input type="hidden" name="variation_id" value="{{ variation_id }}" />
     <input type="hidden" name="destination" value="{{ destination }}" />
-    <input type="submit" value="Add to cart" class="button button--primary form-submit" />
+    {% if user.hasPermission('access variation add to cart') %}
+      <input type="submit" value="Add to cart" class="button button--primary form-submit" />
+    {% endif %}
   </form>
 </div>
