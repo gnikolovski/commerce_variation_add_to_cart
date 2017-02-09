@@ -123,6 +123,10 @@ class VariationAddToCartFormatter extends FormatterBase {
 
     foreach ($items as $delta => $item) {
       $variation = \Drupal\commerce_product\Entity\ProductVariation::load($item->target_id);
+      $is_active = $variation->isActive();
+			if (!$is_active) {
+				continue;
+			}
       $product_id = $variation->getProductId();
       $variation_price = $variation->getPrice();
       $variation_price_number = $variation_price->getNumber();
