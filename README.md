@@ -15,6 +15,9 @@ then this module is for you. Beside showing buttons for each variation, there
 are additional settings, like option to display price, currency and quantity. 
 You can also choose which product attributes to show in your add to cart form.
 
+On the permissions page 'admin/people/permissions' you can control who can use 
+Add to cart button. Search for the 'Access variation add to cart' permission.
+
 To use this module you must have Drupal Commerce 2.x installed. This module was
 created for one of our projects, and it is still in the development phase, just
 like Drupal Commerce 2.x, so if you find bugs or if you want to suggest a
