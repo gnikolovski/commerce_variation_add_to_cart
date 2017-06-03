@@ -8,6 +8,8 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_product\Entity\ProductAttributeInterface;
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_product\Entity\ProductAttributeValue;
 
 /**
  * @file
@@ -31,13 +33,13 @@ class VariationAddToCartFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
-      'show_quantity' => TRUE,
-      'show_price' => TRUE,
-      'show_currency' => TRUE,
-      'price_format' => '2',
-      'attributes' => [],
-    ) + parent::defaultSettings();
+    return [
+        'show_quantity' => TRUE,
+        'show_price' => TRUE,
+        'show_currency' => TRUE,
+        'price_format' => '2',
+        'attributes' => [],
+      ] + parent::defaultSettings();
   }
 
   /**
@@ -49,27 +51,27 @@ class VariationAddToCartFormatter extends FormatterBase {
     $query = \Drupal::entityQuery('commerce_product_attribute');
     $attributes = $query->execute();
 
-    $form['show_quantity'] = array(
+    $form['show_quantity'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show quantity box.'),
       '#default_value' => $this->getSetting('show_quantity'),
-    );
-    $form['show_price'] = array(
+    ];
+    $form['show_price'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show price.'),
       '#default_value' => $this->getSetting('show_price'),
-    );
-    $form['show_currency'] = array(
+    ];
+    $form['show_currency'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show currency.'),
       '#default_value' => $this->getSetting('show_currency'),
-    );
-    $form['price_format'] = array(
+    ];
+    $form['price_format'] = [
       '#type' => 'select',
       '#title' => $this->t('Price format.'),
-      '#options' => array('0' => '0', '2' => '0.00'),
+      '#options' => ['0' => '0', '2' => '0.00'],
       '#default_value' => $this->getSetting('price_format'),
-    );
+    ];
     $form['attributes'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Display the following attributes'),
@@ -84,7 +86,7 @@ class VariationAddToCartFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $summary = array();
+    $summary = [];
 
     if ($this->getSetting('show_quantity')) {
       $summary[] = $this->t('Show quantity box.');
@@ -119,32 +121,31 @@ class VariationAddToCartFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $current_path = \Drupal::request()->getRequestUri();
-    $element = array();
+    $element = [];
 
     foreach ($items as $delta => $item) {
-      $variation = \Drupal\commerce_product\Entity\ProductVariation::load($item->target_id);
+      $variation = ProductVariation::load($item->target_id);
       $is_active = $variation->isActive();
-			if (!$is_active) {
-				continue;
-			}
+      if (!$is_active) {
+        continue;
+      }
       $product_id = $variation->getProductId();
       $variation_price = $variation->getPrice();
       $variation_price_number = $variation_price->getNumber();
       $variation_price_currency = $variation_price->getCurrencyCode();
 
-      // @TODO: this should be refactored.
-      $attributes_values = array();
+      $attributes_values = [];
       $attributes = $variation->getAttributeValueIds();
       foreach ($attributes as $key => $value) {
         $variation_attr = str_replace('attribute_', '', $key);
         $selected_attr = $this->getSetting('attributes');
         if (isset($selected_attr[$variation_attr]) && $selected_attr[$variation_attr] === $variation_attr) {
-          $attribute_name = \Drupal\commerce_product\Entity\ProductAttributeValue::load($value);
+          $attribute_name = ProductAttributeValue::load($value);
           $attributes_values[] = $attribute_name->getName();
         }
       }
 
-      $element[$delta] = array(
+      $element[$delta] = [
         '#theme' => 'variation_add_to_cart_formatter',
         '#product_id' => $product_id,
         '#variation_id' => $item->target_id,
@@ -156,7 +157,7 @@ class VariationAddToCartFormatter extends FormatterBase {
         '#show_quantity' => $this->getSetting('show_quantity') == 1 ? 'number' : 'hidden',
         '#attributes' => $attributes_values,
         '#destination' => $current_path,
-      );
+      ];
 
     }
 
