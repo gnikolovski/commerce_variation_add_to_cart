@@ -9,6 +9,7 @@ use Drupal\commerce_cart\CartProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\Core\Link;
 
 /**
  * Variation add to cart form controller.
@@ -83,11 +84,14 @@ class VariationAddToCart extends ControllerBase {
       $this->cartManager->addOrderItem($cart, $order_item);
 
       // Redirect back.
-      drupal_set_message($this->t('Added to cart'), 'status', TRUE);
+      drupal_set_message($this->t('Product added to @cart-link.', [
+        '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
+      ]), 'status', TRUE);
+
       return new RedirectResponse($destination);
     }
 
-    drupal_set_message($this->t('Item not added to cart'), 'error', TRUE);
+    drupal_set_message($this->t('Product not added to your cart.'), 'error', TRUE);
     return new RedirectResponse($destination);
   }
 
