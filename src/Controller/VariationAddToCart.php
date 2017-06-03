@@ -9,6 +9,8 @@ use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\commerce_order\Entity\OrderItem;
 
 /**
  * variation add to cart form controller.
@@ -56,7 +58,7 @@ class VariationAddToCart extends ControllerBase {
 
     if ($product_id > 0 && $variation_id > 0 && $quantity > 0) {
       // Load product variation and get store.
-      $variation = \Drupal\commerce_product\Entity\ProductVariation::load($variation_id);
+      $variation = ProductVariation::load($variation_id);
       $variation_price = $variation->getPrice();
       $stores = $variation->getStores();
       $store = reset($stores);
@@ -67,7 +69,7 @@ class VariationAddToCart extends ControllerBase {
         $cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default', $store);
       }
 
-      $order_item = \Drupal\commerce_order\Entity\OrderItem::create([
+      $order_item = OrderItem::create([
         'type' => 'default',
         'purchased_entity' => (string) $variation_id,
         'quantity' => $quantity,
@@ -78,12 +80,11 @@ class VariationAddToCart extends ControllerBase {
 
       // Redirect back.
       drupal_set_message($this->t('Added to cart'), 'status', TRUE);
-      $response = new RedirectResponse($destination);
-      return $response;
+      return new RedirectResponse($destination);
     }
+
     drupal_set_message($this->t('Item not added to cart'), 'error', TRUE);
-    $response = new RedirectResponse($destination);
-    return $response;
+    return new RedirectResponse($destination);
   }
 
 }
