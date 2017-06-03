@@ -9,10 +9,10 @@
  * Implements hook_theme().
  */
 function commerce_variation_add_to_cart_theme() {
-  return array(
-    'variation_add_to_cart_formatter' => array(
+  return [
+    'variation_add_to_cart_formatter' => [
       'variables' =>
-        array(
+        [
           'product_id' => NULL,
           'variation_id' => NULL,
           'show_price' => NULL,
@@ -21,9 +21,9 @@ function commerce_variation_add_to_cart_theme() {
           'show_currency' => NULL,
           'price_currency' => NULL,
           'show_quantity' => NULL,
-          'attributes' => NULL,
+          'attributes' => [],
           'destination' => NULL,
-        ),
-    ),
-  );
+        ],
+    ],
+  ];
 }
