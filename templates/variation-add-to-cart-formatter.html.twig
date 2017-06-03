@@ -22,7 +22,7 @@
     <input type="hidden" name="variation_id" value="{{ variation_id }}" />
     <input type="hidden" name="destination" value="{{ destination }}" />
     {% if user.hasPermission('access variation add to cart') %}
-      <input type="submit" value="Add to cart" class="button button--primary form-submit" />
+      <input type="submit" value="{% trans %}Add to cart{% endtrans %}" class="button button--primary form-submit" />
     {% endif %}
   </form>
 </div>
