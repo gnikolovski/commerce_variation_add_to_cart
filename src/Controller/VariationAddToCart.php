@@ -55,6 +55,9 @@ class VariationAddToCart extends ControllerBase {
     $variation_id = (integer) \Drupal::request()->request->get('variation_id');
     $quantity = (integer) \Drupal::request()->request->get('quantity');
     $destination = \Drupal::request()->request->get('destination');
+    if (empty($destination)){
+      $destination = '/cart';
+    }
 
     if ($product_id > 0 && $variation_id > 0 && $quantity > 0) {
       // Load product variation and get store.
