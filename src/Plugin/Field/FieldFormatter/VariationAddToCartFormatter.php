@@ -6,8 +6,6 @@ use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
-use Drupal\commerce_product\Entity\ProductAttributeInterface;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
 
@@ -34,12 +32,12 @@ class VariationAddToCartFormatter extends FormatterBase {
    */
   public static function defaultSettings() {
     return [
-        'show_quantity' => TRUE,
-        'show_price' => TRUE,
-        'show_currency' => TRUE,
-        'price_format' => '2',
-        'attributes' => [],
-      ] + parent::defaultSettings();
+      'show_quantity' => TRUE,
+      'show_price' => TRUE,
+      'show_currency' => TRUE,
+      'price_format' => '2',
+      'attributes' => [],
+    ] + parent::defaultSettings();
   }
 
   /**

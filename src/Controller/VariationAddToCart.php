@@ -4,8 +4,6 @@ namespace Drupal\commerce_variation_add_to_cart\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Drupal\commerce_order\Entity\OrderItemInterface;
-use Drupal\commerce_product\Entity\ProductVariationInterface;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -13,7 +11,7 @@ use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_order\Entity\OrderItem;
 
 /**
- * variation add to cart form controller.
+ * Variation add to cart form controller.
  */
 class VariationAddToCart extends ControllerBase {
 
@@ -31,6 +29,9 @@ class VariationAddToCart extends ControllerBase {
    */
   protected $cartProvider;
 
+  /**
+   * {@inheritdoc}
+   */
   public function __construct(CartManagerInterface $cart_manager, CartProviderInterface $cart_provider) {
     $this->cartManager = $cart_manager;
     $this->cartProvider = $cart_provider;
@@ -55,7 +56,7 @@ class VariationAddToCart extends ControllerBase {
     $variation_id = (integer) \Drupal::request()->request->get('variation_id');
     $quantity = (integer) \Drupal::request()->request->get('quantity');
     $destination = \Drupal::request()->request->get('destination');
-    if (empty($destination)){
+    if (empty($destination)) {
       $destination = '/cart';
     }
 
