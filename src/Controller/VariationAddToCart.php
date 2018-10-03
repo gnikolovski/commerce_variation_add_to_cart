@@ -68,7 +68,9 @@ class VariationAddToCart extends ControllerBase {
       $stores = $variation->getStores();
       $store = reset($stores);
 
-      $cart = $this->cartProvider->getCart('default', $store);
+      $all_carts = \Drupal::service('commerce_cart.cart_provider')
+        ->getCarts();
+      $cart = reset($all_carts);
       // Create cart for user if it already doesn't exist.
       if (!$cart) {
         $cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default', $store);
