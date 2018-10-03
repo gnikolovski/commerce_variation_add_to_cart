@@ -43,7 +43,7 @@ on the gear icon, you can see additional settings.
 
 Goran Nikolovski  
 Website: (http://www.gorannikolovski.com)  
-Drupal: (https://www.drupal.org/user/3451979)  
+Drupal: (https://www.drupal.org/u/gnikolovski)  
 Email: nikolovski84@gmail.com  
 
 Company: Studio Present, Subotica, Serbia  
