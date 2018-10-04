@@ -32,6 +32,7 @@ class VariationAddToCartFormatter extends FormatterBase {
    */
   public static function defaultSettings() {
     return [
+      'show_title' => FALSE,
       'show_quantity' => TRUE,
       'show_price' => TRUE,
       'show_currency' => TRUE,
@@ -49,6 +50,11 @@ class VariationAddToCartFormatter extends FormatterBase {
     $query = \Drupal::entityQuery('commerce_product_attribute');
     $attributes = $query->execute();
 
+    $form['show_title'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Show variation title.'),
+      '#default_value' => $this->getSetting('show_title'),
+    ];
     $form['show_quantity'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Show quantity box.'),
@@ -86,6 +92,12 @@ class VariationAddToCartFormatter extends FormatterBase {
   public function settingsSummary() {
     $summary = [];
 
+    if ($this->getSetting('show_title')) {
+      $summary[] = $this->t('Show variation title.');
+    }
+    else {
+      $summary[] = $this->t('Do not show variation title.');
+    }
     if ($this->getSetting('show_quantity')) {
       $summary[] = $this->t('Show quantity box.');
     }
@@ -145,8 +157,11 @@ class VariationAddToCartFormatter extends FormatterBase {
 
       $element[$delta] = [
         '#theme' => 'variation_add_to_cart_formatter',
+        '#variation' => $variation,
         '#product_id' => $product_id,
         '#variation_id' => $item->target_id,
+        '#show_title' => $this->getSetting('show_title'),
+        '#title' => $variation->getTitle(),
         '#show_price' => $this->getSetting('show_price'),
         '#price_number' => $variation_price_number,
         '#price_format' => $this->getSetting('price_format'),

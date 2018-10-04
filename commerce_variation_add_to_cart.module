@@ -13,8 +13,11 @@ function commerce_variation_add_to_cart_theme() {
     'variation_add_to_cart_formatter' => [
       'variables' =>
         [
+          'variation' => NULL,
           'product_id' => NULL,
           'variation_id' => NULL,
+          'show_title' => NULL,
+          'title' => NULL,
           'show_price' => NULL,
           'price_number' => NULL,
           'price_format' => NULL,

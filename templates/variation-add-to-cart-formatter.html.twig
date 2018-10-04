@@ -1,4 +1,9 @@
 <div class="commerce-variation-add-to-cart" id="commerce-variation-add-to-cart-{{ variation_id }}">
+  {% if show_title %}
+    <div class="variation-title">
+      {{ title }}
+    </div>
+  {% endif %}
   <div class="attributes">
     {% for attr in attributes %}
       <div class="attribute-{{ attr }}">
