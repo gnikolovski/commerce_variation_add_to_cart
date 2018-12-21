@@ -4,4 +4,4 @@ description: 'Provides separate Add to cart button for each product variation.'
 package: Commerce
 core: 8.x
 dependencies:
-  - drupal:commerce
+  - commerce:commerce
