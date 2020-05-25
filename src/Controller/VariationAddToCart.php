@@ -86,14 +86,14 @@ class VariationAddToCart extends ControllerBase {
       $this->cartManager->addOrderItem($cart, $order_item);
 
       // Redirect back.
-      drupal_set_message($this->t('Product added to @cart-link.', [
+      $this->messenger()->addMessage($this->t('Product added to @cart-link.', [
         '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
       ]), 'status', TRUE);
 
       return new RedirectResponse($destination);
     }
 
-    drupal_set_message($this->t('Product not added to your cart.'), 'error', TRUE);
+    $this->messenger()->addMessage($this->t('Product not added to your cart.'), 'error', TRUE);
     return new RedirectResponse($destination);
   }
 

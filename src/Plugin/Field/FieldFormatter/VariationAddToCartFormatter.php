@@ -135,7 +135,7 @@ class VariationAddToCartFormatter extends FormatterBase {
 
     foreach ($items as $delta => $item) {
       $variation = ProductVariation::load($item->target_id);
-      $is_active = $variation->isActive();
+      $is_active = $variation->isPublished();
       if (!$is_active) {
         continue;
       }

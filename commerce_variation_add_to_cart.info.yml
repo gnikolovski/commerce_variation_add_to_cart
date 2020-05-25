@@ -3,5 +3,6 @@ type: module
 description: 'Provides separate Add to cart button for each product variation.'
 package: Commerce (contrib)
 core: 8.x
+core_version_requirement: ^8 || ^9
 dependencies:
   - commerce:commerce
