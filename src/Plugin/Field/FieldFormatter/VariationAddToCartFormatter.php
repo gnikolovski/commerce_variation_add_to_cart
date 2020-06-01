@@ -2,17 +2,16 @@
 
 namespace Drupal\commerce_variation_add_to_cart\Plugin\Field\FieldFormatter;
 
-use Drupal\Core\Field\FormatterBase;
-use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_product\Entity\ProductAttributeValue;
-
-/**
- * @file
- * Contains \Drupal\Random\Plugin\Field\FieldFormatter\RandomDefaultFormatter.
- */
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\FormatterBase;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Plugin implementation of the 'variation_add_to_cart_form' formatter.
@@ -25,7 +24,52 @@ use Drupal\commerce_product\Entity\ProductAttributeValue;
  *   }
  * )
  */
-class VariationAddToCartFormatter extends FormatterBase {
+class VariationAddToCartFormatter extends FormatterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The entity query.
+   *
+   * @var \Drupal\Core\Entity\Query\QueryInterface
+   */
+  protected $entityQuery;
+
+  /**
+   * The current request.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected $currentRequest;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $instance->setEntityQuery($container->get('entity_type.manager'));
+    $instance->setCurrentRequest($container->get('request_stack'));
+    return $instance;
+  }
+
+  /**
+   * Sets entity query.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  public function setEntityQuery(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityQuery = $entity_type_manager->getStorage('commerce_product_attribute')
+      ->getQuery();
+  }
+
+  /**
+   * Sets the current request.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   The request stack.
+   */
+  public function setCurrentRequest(RequestStack $request_stack) {
+    $this->currentRequest = $request_stack->getCurrentRequest();
+  }
 
   /**
    * {@inheritdoc}
@@ -47,8 +91,7 @@ class VariationAddToCartFormatter extends FormatterBase {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 
-    $query = \Drupal::entityQuery('commerce_product_attribute');
-    $attributes = $query->execute();
+    $attributes = $this->entityQuery->execute();
 
     $form['show_title'] = [
       '#type' => 'checkbox',
@@ -130,7 +173,7 @@ class VariationAddToCartFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $current_path = \Drupal::request()->getRequestUri();
+    $current_path = $this->currentRequest->getRequestUri();
     $element = [];
 
     foreach ($items as $delta => $item) {

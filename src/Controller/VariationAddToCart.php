@@ -2,14 +2,15 @@
 
 namespace Drupal\commerce_variation_add_to_cart\Controller;
 
-use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\commerce_cart\CartManagerInterface;
 use Drupal\commerce_cart\CartProviderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\commerce_order\Entity\OrderItem;
+use Drupal\commerce_product\Entity\ProductVariation;
+use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Link;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Variation add to cart form controller.
@@ -31,21 +32,51 @@ class VariationAddToCart extends ControllerBase {
   protected $cartProvider;
 
   /**
-   * {@inheritdoc}
+   * The current request.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
    */
-  public function __construct(CartManagerInterface $cart_manager, CartProviderInterface $cart_provider) {
-    $this->cartManager = $cart_manager;
-    $this->cartProvider = $cart_provider;
-  }
+  protected $currentRequest;
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('commerce_cart.cart_manager'),
-      $container->get('commerce_cart.cart_provider')
-    );
+    $instance = parent::create($container);
+    $instance->setCartManager($container->get('commerce_cart.cart_manager'));
+    $instance->setCartProvider($container->get('commerce_cart.cart_provider'));
+    $instance->setCurrentRequest($container->get('request_stack'));
+    return $instance;
+  }
+
+  /**
+   * Sets the cart manager.
+   *
+   * @param \Drupal\commerce_cart\CartManagerInterface $cart_manager
+   *   The cart manager.
+   */
+  public function setCartManager(CartManagerInterface $cart_manager) {
+    $this->cartManager = $cart_manager;
+  }
+
+  /**
+   * Sets the cart provider.
+   *
+   * @param \Drupal\commerce_cart\CartProviderInterface $cart_provider
+   *   The cart provider.
+   */
+  public function setCartProvider(CartProviderInterface $cart_provider) {
+    $this->cartProvider = $cart_provider;
+  }
+
+  /**
+   * Sets the current request.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   *   The request stack.
+   */
+  public function setCurrentRequest(RequestStack $request_stack) {
+    $this->currentRequest = $request_stack->getCurrentRequest();
   }
 
   /**
@@ -53,10 +84,10 @@ class VariationAddToCart extends ControllerBase {
    */
   public function addItem() {
     // Get item data from post request.
-    $product_id = (integer) \Drupal::request()->request->get('product_id');
-    $variation_id = (integer) \Drupal::request()->request->get('variation_id');
-    $quantity = (integer) \Drupal::request()->request->get('quantity');
-    $destination = \Drupal::request()->request->get('destination');
+    $product_id = (integer) $this->currentRequest->request->get('product_id');
+    $variation_id = (integer) $this->currentRequest->request->get('variation_id');
+    $quantity = (integer) $this->currentRequest->request->get('quantity');
+    $destination = $this->currentRequest->request->get('destination');
     if (empty($destination)) {
       $destination = '/cart';
     }
@@ -68,12 +99,11 @@ class VariationAddToCart extends ControllerBase {
       $stores = $variation->getStores();
       $store = reset($stores);
 
-      $all_carts = \Drupal::service('commerce_cart.cart_provider')
-        ->getCarts();
+      $all_carts = $this->cartProvider->getCarts();
       $cart = reset($all_carts);
       // Create cart for user if it already doesn't exist.
       if (!$cart) {
-        $cart = \Drupal::service('commerce_cart.cart_provider')->createCart('default', $store);
+        $cart = $this->cartProvider->createCart('default', $store);
       }
 
       $order_item = OrderItem::create([
@@ -84,11 +114,6 @@ class VariationAddToCart extends ControllerBase {
       ]);
       $order_item->save();
       $this->cartManager->addOrderItem($cart, $order_item);
-
-      // Redirect back.
-      $this->messenger()->addMessage($this->t('Product added to @cart-link.', [
-        '@cart-link' => Link::createFromRoute($this->t('your cart', [], ['context' => 'cart link']), 'commerce_cart.page')->toString(),
-      ]), 'status', TRUE);
 
       return new RedirectResponse($destination);
     }
