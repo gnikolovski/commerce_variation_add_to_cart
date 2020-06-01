@@ -7,7 +7,6 @@ use Drupal\commerce_cart\CartProviderInterface;
 use Drupal\commerce_order\Entity\OrderItem;
 use Drupal\commerce_product\Entity\ProductVariation;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Link;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
