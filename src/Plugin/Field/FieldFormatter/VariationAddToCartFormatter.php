@@ -178,10 +178,13 @@ class VariationAddToCartFormatter extends FormatterBase implements ContainerFact
 
     foreach ($items as $delta => $item) {
       $variation = ProductVariation::load($item->target_id);
-      $is_active = $variation->isPublished();
+
+      $is_active = !empty($variation) ? $variation->isPublished() : FALSE;
+
       if (!$is_active) {
         continue;
       }
+
       $product_id = $variation->getProductId();
       $variation_price = $variation->getPrice();
       $variation_price_number = $variation_price->getNumber();
