@@ -16,7 +16,7 @@ class CommerceVariationAddToCartTest extends EntityKernelTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'commerce_variation_add_to_cart',
   ];
 

@@ -2,7 +2,6 @@ name: Commerce Variation Add to Cart
 type: module
 description: 'Provides separate Add to cart button for each product variation.'
 package: Commerce (contrib)
-core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9 || ^10
 dependencies:
   - commerce:commerce
